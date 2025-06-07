@@ -19,11 +19,6 @@
             display: none;
             cursor: crosshair;
         }
-        #result {
-            margin-top: 0;
-            max-width: 100%;
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -31,7 +26,6 @@
     <p>Select an image file, draw a rectangle on the image and press CUT.</p>
     <input type="file" id="imageInput" accept="image/*" />
     <canvas id="canvas"></canvas>
-    <img id="result" alt="Cropped image" />
     <br>
     <button id="cutButton">CUT</button>
 
@@ -40,7 +34,6 @@
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const cutButton = document.getElementById('cutButton');
-        const result = document.getElementById('result');
 
         let img = new Image();
         let startX = 0, startY = 0, endX = 0, endY = 0;
@@ -50,7 +43,6 @@
             const file = input.files[0];
             if (!file || !file.type.startsWith('image/')) {
                 canvas.style.display = 'none';
-                result.style.display = 'none';
                 return;
             }
             const reader = new FileReader();
@@ -60,7 +52,6 @@
                     canvas.height = img.height;
                     ctx.drawImage(img, 0, 0);
                     canvas.style.display = 'block';
-                    result.style.display = 'none';
                 };
                 img.src = e.target.result;
             };
@@ -124,9 +115,16 @@
             tempCanvas.width = w;
             tempCanvas.height = h;
             tempCanvas.getContext('2d').drawImage(canvas, x, y, w, h, 0, 0, w, h);
-            result.src = tempCanvas.toDataURL();
-            result.style.display = 'block';
-            canvas.style.display = 'none';
+
+            canvas.width = w;
+            canvas.height = h;
+            ctx.clearRect(0, 0, w, h);
+            ctx.drawImage(tempCanvas, 0, 0);
+
+            img.src = canvas.toDataURL();
+
+            startX = startY = endX = endY = 0;
+            redraw();
         });
     </script>
 </body>
