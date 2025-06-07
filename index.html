@@ -67,10 +67,20 @@
             reader.readAsDataURL(file);
         });
 
-        canvas.addEventListener('mousedown', (e) => {
+        function getPos(e) {
             const rect = canvas.getBoundingClientRect();
-            startX = e.clientX - rect.left;
-            startY = e.clientY - rect.top;
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            return {
+                x: (e.clientX - rect.left) * scaleX,
+                y: (e.clientY - rect.top) * scaleY
+            };
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            const pos = getPos(e);
+            startX = pos.x;
+            startY = pos.y;
             endX = startX;
             endY = startY;
             dragging = true;
@@ -78,14 +88,15 @@
 
         canvas.addEventListener('mousemove', (e) => {
             if (!dragging) return;
-            const rect = canvas.getBoundingClientRect();
-            endX = e.clientX - rect.left;
-            endY = e.clientY - rect.top;
+            const pos = getPos(e);
+            endX = pos.x;
+            endY = pos.y;
             redraw();
         });
 
         canvas.addEventListener('mouseup', () => {
             dragging = false;
+            redraw();
         });
 
         function redraw() {
