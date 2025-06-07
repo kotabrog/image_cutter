@@ -75,10 +75,12 @@
         let dragging = false;
 
         function downloadImage(name) {
+            redraw(false);
             const link = document.createElement('a');
             link.download = name || 'cut-image.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
+            redraw();
         }
 
         input.addEventListener('change', () => {
@@ -134,10 +136,10 @@
             redraw();
         });
 
-        function redraw() {
+        function redraw(showSelection = true) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(img, 0, 0);
-            if (dragging || startX !== endX || startY !== endY) {
+            if (showSelection && (dragging || startX !== endX || startY !== endY)) {
                 ctx.strokeStyle = 'red';
                 ctx.lineWidth = 1;
                 ctx.setLineDash([5, 3]);
@@ -147,6 +149,7 @@
                 const h = Math.abs(endY - startY);
                 ctx.strokeRect(x, y, w, h);
             }
+            ctx.setLineDash([]);
         }
 
         cutButton.addEventListener('click', () => {
@@ -155,6 +158,7 @@
             const w = Math.abs(endX - startX);
             const h = Math.abs(endY - startY);
             if (w === 0 || h === 0) return;
+            redraw(false);
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = w;
             tempCanvas.height = h;
@@ -168,6 +172,7 @@
             img.src = canvas.toDataURL();
 
             startX = startY = endX = endY = 0;
+            dragging = false;
             redraw();
         });
 
