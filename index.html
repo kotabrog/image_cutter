@@ -6,16 +6,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen px-4 font-sans flex flex-col items-center">
-    <div class="max-w-4xl w-full bg-white p-6 rounded-lg shadow flex flex-col h-screen">
-        <div class="sticky top-0 bg-white text-center">
+    <div id="container" class="max-w-4xl w-full bg-white p-6 rounded-lg shadow flex flex-col h-screen">
+        <div id="header" class="sticky top-0 bg-white text-center">
             <h1 class="text-2xl font-bold mb-2">Upload and Cut an Image</h1>
             <p class="mb-4 text-gray-600">Select an image file, draw a rectangle on the image and press CUT.</p>
             <input type="file" id="imageInput" accept="image/*" class="mb-4" />
         </div>
-        <div class="flex-grow overflow-auto">
-            <canvas id="canvas" class="border border-gray-300 rounded mx-auto max-w-full cursor-crosshair" style="display:none;"></canvas>
-        </div>
-        <div class="sticky bottom-0 bg-white pt-4 flex justify-center space-x-2">
+        <canvas id="canvas" class="border border-gray-300 rounded mx-auto max-w-full cursor-crosshair" style="display:none;"></canvas>
+        <div id="actions" class="sticky bottom-0 bg-white pt-4 flex justify-center space-x-2">
             <button id="cutButton" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">CUT</button>
             <div id="saveContainer" class="relative inline-block">
                 <div class="flex">
@@ -40,6 +38,19 @@
         const saveMenu = document.getElementById('saveMenu');
         const saveMenuSave = document.getElementById('saveMenuSave');
         const saveMenuSaveAs = document.getElementById('saveMenuSaveAs');
+        const container = document.getElementById('container');
+        const headerEl = document.getElementById('header');
+        const actionsEl = document.getElementById('actions');
+
+        function resizeCanvasDisplay() {
+            const maxWidth = container.clientWidth;
+            const maxHeight = window.innerHeight - headerEl.offsetHeight - actionsEl.offsetHeight - 40;
+            const scale = Math.min(maxWidth / canvas.width, maxHeight / canvas.height, 1);
+            canvas.style.width = canvas.width * scale + 'px';
+            canvas.style.height = canvas.height * scale + 'px';
+        }
+
+        window.addEventListener('resize', resizeCanvasDisplay);
 
         let img = new Image();
         let startX = 0, startY = 0, endX = 0, endY = 0;
@@ -75,6 +86,7 @@
                     canvas.width = img.width;
                     canvas.height = img.height;
                     ctx.drawImage(img, 0, 0);
+                    resizeCanvasDisplay();
                     canvas.style.display = 'block';
                     saveButton.disabled = false;
                     saveOptionsButton.disabled = false;
@@ -150,6 +162,7 @@
             canvas.height = h;
             ctx.clearRect(0, 0, w, h);
             ctx.drawImage(tempCanvas, 0, 0);
+            resizeCanvasDisplay();
 
             img.src = canvas.toDataURL();
 
