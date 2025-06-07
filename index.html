@@ -20,7 +20,7 @@
             cursor: crosshair;
         }
         #result {
-            margin-top: 20px;
+            margin-top: 0;
             max-width: 100%;
             display: none;
         }
@@ -31,9 +31,9 @@
     <p>Select an image file, draw a rectangle on the image and press CUT.</p>
     <input type="file" id="imageInput" accept="image/*" />
     <canvas id="canvas"></canvas>
+    <img id="result" alt="Cropped image" />
     <br>
     <button id="cutButton">CUT</button>
-    <img id="result" alt="Cropped image" />
 
     <script>
         const input = document.getElementById('imageInput');
@@ -126,6 +126,7 @@
             tempCanvas.getContext('2d').drawImage(canvas, x, y, w, h, 0, 0, w, h);
             result.src = tempCanvas.toDataURL();
             result.style.display = 'block';
+            canvas.style.display = 'none';
         });
     </script>
 </body>
