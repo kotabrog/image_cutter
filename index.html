@@ -43,6 +43,7 @@
             const file = input.files[0];
             if (!file || !file.type.startsWith('image/')) {
                 canvas.style.display = 'none';
+                input.value = '';
                 return;
             }
             const reader = new FileReader();
@@ -54,6 +55,7 @@
                     canvas.style.display = 'block';
                 };
                 img.src = e.target.result;
+                input.value = '';
             };
             reader.readAsDataURL(file);
         });
