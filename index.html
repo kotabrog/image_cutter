@@ -2,10 +2,56 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>image_cutter</title>
+    <title>Image Uploader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px auto;
+            max-width: 600px;
+            text-align: center;
+        }
+        input[type="file"] {
+            margin: 20px 0;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello GitHub Pages</h1>
-    <p>This is a minimal static site.</p>
+    <h1>Upload and Display an Image</h1>
+    <p>Select an image file from your device to see a preview.</p>
+    <input type="file" id="imageInput" accept="image/*" />
+    <img id="preview" alt="Image preview" />
+
+    <script>
+        const input = document.getElementById('imageInput');
+        const preview = document.getElementById('preview');
+
+        input.addEventListener('change', () => {
+            const file = input.files[0];
+            if (!file) {
+                preview.style.display = 'none';
+                preview.src = '';
+                return;
+            }
+            if (!file.type.startsWith('image/')) {
+                alert('Please choose an image file.');
+                input.value = '';
+                preview.style.display = 'none';
+                preview.src = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.addEventListener('load', () => {
+                preview.src = reader.result;
+                preview.style.display = 'block';
+            });
+            reader.readAsDataURL(file);
+        });
+    </script>
 </body>
 </html>
