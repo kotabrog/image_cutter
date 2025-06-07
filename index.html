@@ -193,12 +193,32 @@
             downloadImage('cut-image.png');
         });
 
-        saveMenuSaveAs.addEventListener('click', () => {
+        saveMenuSaveAs.addEventListener('click', async () => {
             saveMenu.style.display = 'none';
-            const name = prompt('Enter file name:', 'cut-image.png');
-            if (name !== null) {
-                const safeName = name.trim() || 'cut-image.png';
-                downloadImage(safeName);
+            if (window.showSaveFilePicker) {
+                try {
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: 'cut-image.png',
+                        types: [{
+                            description: 'PNG files',
+                            accept: { 'image/png': ['.png'] }
+                        }]
+                    });
+                    const writable = await handle.createWritable();
+                    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                    await writable.write(blob);
+                    await writable.close();
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        alert('Failed to save file');
+                    }
+                }
+            } else {
+                const name = prompt('Enter file name:', 'cut-image.png');
+                if (name !== null) {
+                    const safeName = name.trim() || 'cut-image.png';
+                    downloadImage(safeName);
+                }
             }
         });
     </script>
