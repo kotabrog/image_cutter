@@ -28,12 +28,14 @@
     <canvas id="canvas"></canvas>
     <br>
     <button id="cutButton">CUT</button>
+    <button id="saveButton">SAVE</button>
 
     <script>
         const input = document.getElementById('imageInput');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const cutButton = document.getElementById('cutButton');
+        const saveButton = document.getElementById('saveButton');
 
         let img = new Image();
         let startX = 0, startY = 0, endX = 0, endY = 0;
@@ -127,6 +129,13 @@
 
             startX = startY = endX = endY = 0;
             redraw();
+        });
+
+        saveButton.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'cut-image.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
         });
     </script>
 </body>
