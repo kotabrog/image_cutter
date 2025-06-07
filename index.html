@@ -41,6 +41,10 @@
         #saveMenu div:hover {
             background: #f0f0f0;
         }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -51,8 +55,8 @@
     <br>
     <button id="cutButton">CUT</button>
     <div id="saveContainer">
-        <button id="saveButton">SAVE</button>
-        <button id="saveOptionsButton">&#x25BE;</button>
+        <button id="saveButton" disabled>SAVE</button>
+        <button id="saveOptionsButton" disabled>&#x25BE;</button>
         <div id="saveMenu">
             <div id="saveMenuSave">Save</div>
             <div id="saveMenuSaveAs">Save As...</div>
@@ -74,6 +78,11 @@
         let startX = 0, startY = 0, endX = 0, endY = 0;
         let dragging = false;
 
+        // disable save buttons until an image is loaded
+        saveButton.disabled = true;
+        saveOptionsButton.disabled = true;
+        saveMenu.style.display = 'none';
+
         function downloadImage(name) {
             const link = document.createElement('a');
             link.download = name || 'cut-image.png';
@@ -86,6 +95,9 @@
             if (!file || !file.type.startsWith('image/')) {
                 canvas.style.display = 'none';
                 input.value = '';
+                saveButton.disabled = true;
+                saveOptionsButton.disabled = true;
+                saveMenu.style.display = 'none';
                 return;
             }
             const reader = new FileReader();
@@ -95,6 +107,9 @@
                     canvas.height = img.height;
                     ctx.drawImage(img, 0, 0);
                     canvas.style.display = 'block';
+                    saveButton.disabled = false;
+                    saveOptionsButton.disabled = false;
+                    saveMenu.style.display = 'none';
                 };
                 img.src = e.target.result;
                 input.value = '';
