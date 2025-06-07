@@ -19,6 +19,28 @@
             display: none;
             cursor: crosshair;
         }
+        #saveContainer {
+            display: inline-block;
+            position: relative;
+        }
+        #saveOptionsButton {
+            width: 20px;
+        }
+        #saveMenu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: #fff;
+            border: 1px solid #ccc;
+            display: none;
+        }
+        #saveMenu div {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        #saveMenu div:hover {
+            background: #f0f0f0;
+        }
     </style>
 </head>
 <body>
@@ -28,7 +50,14 @@
     <canvas id="canvas"></canvas>
     <br>
     <button id="cutButton">CUT</button>
-    <button id="saveButton">SAVE</button>
+    <div id="saveContainer">
+        <button id="saveButton">SAVE</button>
+        <button id="saveOptionsButton">&#x25BE;</button>
+        <div id="saveMenu">
+            <div id="saveMenuSave">Save</div>
+            <div id="saveMenuSaveAs">Save As...</div>
+        </div>
+    </div>
 
     <script>
         const input = document.getElementById('imageInput');
@@ -36,10 +65,21 @@
         const ctx = canvas.getContext('2d');
         const cutButton = document.getElementById('cutButton');
         const saveButton = document.getElementById('saveButton');
+        const saveOptionsButton = document.getElementById('saveOptionsButton');
+        const saveMenu = document.getElementById('saveMenu');
+        const saveMenuSave = document.getElementById('saveMenuSave');
+        const saveMenuSaveAs = document.getElementById('saveMenuSaveAs');
 
         let img = new Image();
         let startX = 0, startY = 0, endX = 0, endY = 0;
         let dragging = false;
+
+        function downloadImage(name) {
+            const link = document.createElement('a');
+            link.download = name || 'cut-image.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
 
         input.addEventListener('change', () => {
             const file = input.files[0];
@@ -132,10 +172,34 @@
         });
 
         saveButton.addEventListener('click', () => {
-            const link = document.createElement('a');
-            link.download = 'cut-image.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
+            downloadImage('cut-image.png');
+        });
+
+        saveOptionsButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            saveMenu.style.display = saveMenu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        document.addEventListener('click', () => {
+            saveMenu.style.display = 'none';
+        });
+
+        saveMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        saveMenuSave.addEventListener('click', () => {
+            saveMenu.style.display = 'none';
+            downloadImage('cut-image.png');
+        });
+
+        saveMenuSaveAs.addEventListener('click', () => {
+            saveMenu.style.display = 'none';
+            const name = prompt('Enter file name:', 'cut-image.png');
+            if (name !== null) {
+                const safeName = name.trim() || 'cut-image.png';
+                downloadImage(safeName);
+            }
         });
     </script>
 </body>
