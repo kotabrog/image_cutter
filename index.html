@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Image Uploader</title>
+    <title>Image Cutter</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,44 +13,108 @@
         input[type="file"] {
             margin: 20px 0;
         }
-        img {
+        canvas {
             max-width: 100%;
-            height: auto;
+            border: 1px solid #ccc;
             display: none;
+            cursor: crosshair;
+        }
+        #result {
             margin-top: 20px;
+            max-width: 100%;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <h1>Upload and Display an Image</h1>
-    <p>Select an image file from your device to see a preview.</p>
+    <h1>Upload and Cut an Image</h1>
+    <p>Select an image file, draw a rectangle on the image and press CUT.</p>
     <input type="file" id="imageInput" accept="image/*" />
-    <img id="preview" alt="Image preview" />
+    <canvas id="canvas"></canvas>
+    <br>
+    <button id="cutButton">CUT</button>
+    <img id="result" alt="Cropped image" />
 
     <script>
         const input = document.getElementById('imageInput');
-        const preview = document.getElementById('preview');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const cutButton = document.getElementById('cutButton');
+        const result = document.getElementById('result');
+
+        let img = new Image();
+        let startX = 0, startY = 0, endX = 0, endY = 0;
+        let dragging = false;
 
         input.addEventListener('change', () => {
             const file = input.files[0];
-            if (!file) {
-                preview.style.display = 'none';
-                preview.src = '';
-                return;
-            }
-            if (!file.type.startsWith('image/')) {
-                alert('Please choose an image file.');
-                input.value = '';
-                preview.style.display = 'none';
-                preview.src = '';
+            if (!file || !file.type.startsWith('image/')) {
+                canvas.style.display = 'none';
+                result.style.display = 'none';
                 return;
             }
             const reader = new FileReader();
-            reader.addEventListener('load', () => {
-                preview.src = reader.result;
-                preview.style.display = 'block';
-            });
+            reader.onload = (e) => {
+                img.onload = () => {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    canvas.style.display = 'block';
+                    result.style.display = 'none';
+                };
+                img.src = e.target.result;
+            };
             reader.readAsDataURL(file);
+        });
+
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+            endX = startX;
+            endY = startY;
+            dragging = true;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!dragging) return;
+            const rect = canvas.getBoundingClientRect();
+            endX = e.clientX - rect.left;
+            endY = e.clientY - rect.top;
+            redraw();
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            dragging = false;
+        });
+
+        function redraw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+            if (dragging || startX !== endX || startY !== endY) {
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([5, 3]);
+                const x = Math.min(startX, endX);
+                const y = Math.min(startY, endY);
+                const w = Math.abs(endX - startX);
+                const h = Math.abs(endY - startY);
+                ctx.strokeRect(x, y, w, h);
+            }
+        }
+
+        cutButton.addEventListener('click', () => {
+            const x = Math.min(startX, endX);
+            const y = Math.min(startY, endY);
+            const w = Math.abs(endX - startX);
+            const h = Math.abs(endY - startY);
+            if (w === 0 || h === 0) return;
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = w;
+            tempCanvas.height = h;
+            tempCanvas.getContext('2d').drawImage(canvas, x, y, w, h, 0, 0, w, h);
+            result.src = tempCanvas.toDataURL();
+            result.style.display = 'block';
         });
     </script>
 </body>
