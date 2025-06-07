@@ -104,8 +104,17 @@
         canvas.addEventListener('mousemove', (e) => {
             if (!dragging) return;
             const pos = getPos(e);
-            endX = pos.x;
-            endY = pos.y;
+            endX = Math.max(0, Math.min(pos.x, canvas.width));
+            endY = Math.max(0, Math.min(pos.y, canvas.height));
+            redraw();
+        });
+
+        canvas.addEventListener('mouseleave', (e) => {
+            if (!dragging) return;
+            const pos = getPos(e);
+            endX = Math.max(0, Math.min(pos.x, canvas.width));
+            endY = Math.max(0, Math.min(pos.y, canvas.height));
+            dragging = false;
             redraw();
         });
 
