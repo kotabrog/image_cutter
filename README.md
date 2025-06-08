@@ -1,7 +1,7 @@
 # image_cutter
 
-This repository contains a minimal static site for GitHub Pages.
+This repository hosts a minimal static site served via GitHub Pages. It is a website where you can cut images.
 
-To publish the site, enable GitHub Pages in the repository settings and select
-`main` as the branch, using the `/ (root)` folder. Once enabled, the
-`index.html` file will be served as the site homepage.
+GitHub Pages is already enabled for the `main` branch using the `/ (root)` folder, so `index.html` is served as the site homepage.
+
+You can visit the live site at [https://kotabrog.github.io/image_cutter/](https://kotabrog.github.io/image_cutter/).
